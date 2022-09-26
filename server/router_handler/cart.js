@@ -16,7 +16,7 @@ exports.addToCart = (req, res) => {
             if (checkRes.length === 1) {
                 // 使购物车数量增加，更新价格
                 let updateQuantity = checkRes[0].quantity + (info.quantity ? info.quantity : 1)
-                db.query(`update cart set quantity=?,price=? where userId=${req.auth.userId} and proId=${info.proId}`, [updateQuantity, selectRes[0].price * updateQuantity], (updateErr, updateRes) => {
+                db.query(`update cart set quantity=?,price=? where userId=${req.auth.userId} and proId=${info.proId} and status=1`, [updateQuantity, selectRes[0].price * updateQuantity], (updateErr, updateRes) => {
                     if (updateErr) return res.cc(updateErr)
                     if (updateRes.affectedRows !== 1) return res.cc("添加至购物车失败！", 500)
                     res.cc(`添加至购物车成功！数量+${info.quantity ? info.quantity : 1}`, 200)

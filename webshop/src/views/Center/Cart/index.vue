@@ -95,7 +95,13 @@
           >
         </div>
         <div class="right">
-          <el-button type="danger" class="btn">去结算</el-button>
+          <el-button
+            type="danger"
+            class="btn"
+            @click="goPay"
+            v-loading.fullscreen.lock="fullscreenLoading"
+            >去结算</el-button
+          >
         </div>
       </div>
     </div>
@@ -107,6 +113,7 @@ import { mapState } from "vuex";
 export default {
   data() {
     return {
+      fullscreenLoading: false,
       total: 0,
     };
   },
@@ -120,7 +127,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("getCartList");
-    this.$store.commit("CHECKCARTITEM")
+    this.$store.commit("CHECKCARTITEM");
   },
   methods: {
     // 删除
@@ -129,22 +136,22 @@ export default {
     },
     // 处理选择器选中事件
     handleSelectionChange(val) {
-      let that = this
-      that.total = 0
-      val.forEach(element => {
-        that.total += element.price
+      let that = this;
+      that.total = 0;
+      val.forEach((element) => {
+        that.total += element.price;
       });
-      this.$store.commit("CHECKCARTITEM",val)
+      this.$store.commit("CHECKCARTITEM", val);
     },
     // 删除所选
     deleteSelected() {
-      let arr = []
-      this.checkList.forEach(element => {
-        arr.push(element.carId)
+      let arr = [];
+      this.checkList.forEach((element) => {
+        arr.push(element.carId);
       });
-      this.$store.dispatch("delFromCart2",arr)
+      this.$store.dispatch("delFromCart2", arr);
       // 删除后清空checklist
-      this.$store.commit("CHECKCARTITEM")
+      this.$store.commit("CHECKCARTITEM");
     },
     // 修改数量
     handleChange(value, row) {
@@ -153,6 +160,18 @@ export default {
         quantity: Math.round(value),
       });
     },
+    // 去支付
+    goPay() {
+      this.fullscreenLoading = true;
+      setTimeout(() => {
+        this.fullscreenLoading = false;
+        this.$router.push({
+          name: "trade",
+          query: { total: this.total, checkList: this.checkList },
+        });
+      }, 2000);
+    },
+    
   },
 };
 </script>

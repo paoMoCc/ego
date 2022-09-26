@@ -49,10 +49,10 @@ exports.getMyPro = (req, res) => {
 // 搜索商品
 exports.searchPro = (req,res) => {
     const keyWord = req.body.keyWord
-    const sql = `select * from product where (proName like ? or subTitle like ?) and status=1 and stock>0`
-    db.query(sql,[`%${keyWord}%`,`%${keyWord}%`],(err,results)=>{
+    const sql = `select * from product where proName like ? and status=1 and stock>0`
+    db.query(sql,`%${keyWord}%`,(err,results)=>{
         if (err) return res.cc(err)
-        if (results.length < 1) return res.cc("什么都没找到啊T T",500)
+        if (results.length < 1) return res.cc("什么都没找到啊T T",201)
         res.send({
             status:200,
             message:'为您找到以下结果：',

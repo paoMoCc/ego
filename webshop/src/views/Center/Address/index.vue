@@ -205,49 +205,11 @@ export default {
       value: "中国大陆",
       // 是否处于修改状态
       isModifying: false,
-      // 表格数据
-      // tableData: [
-      //   {
-      //     date: "2016-05-03",
-      //     name: "二狗",
-      //     address: "翻斗花园幼儿园",
-      //   },
-      //   {
-      //     date: "2016-05-02",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      //   {
-      //     date: "2016-05-04",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      //   {
-      //     date: "2016-05-01",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      //   {
-      //     date: "2016-05-08",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      //   {
-      //     date: "2016-05-06",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      //   {
-      //     date: "2016-05-07",
-      //     name: "王小虎",
-      //     address: "上海市普陀区金沙江路 1518 弄",
-      //   },
-      // ],
     };
   },
   computed: {
     ...mapState({
-      tableData: (state) => state.trade.address,
+      tableData: (state) => state.order.address,
     }),
   },
   methods: {
@@ -277,7 +239,7 @@ export default {
               if (result.status === 200) {
                 // 成功之后重新获取收货地址列表
                 this.$store.dispatch("getMyAddress");
-                this.resetForm('ruleForm')
+                this.resetForm("ruleForm");
               } else {
                 this.$message({
                   showClose: true,
@@ -313,6 +275,8 @@ export default {
                   type: "error",
                 });
               }
+              // 清空表单
+              this.resetForm("ruleForm");
             })
             .catch((err) => {
               console.log(err);
@@ -345,9 +309,8 @@ export default {
       form.detailAdd = item.detailAdd;
       // 关闭加载状态
       setTimeout(() => {
-          loading.close();
-        }, 500);
-
+        loading.close();
+      }, 500);
     },
     // 删除(表格)
     deleteAdd(item) {

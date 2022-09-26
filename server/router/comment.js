@@ -9,6 +9,6 @@ router.post('/eval',commentHandler.eval)
 router.delete('/delComment',commentHandler.delComment)
 
 // 获取评论（当前商品）
-router.get('/getComment',commentHandler.getComment)
+router.post('/getComment',commentHandler.getComment)
 
 module.exports = router

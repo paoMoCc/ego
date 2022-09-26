@@ -7,7 +7,7 @@ const state = {
 };
 const mutations = {
   UPDATESEARCHLIST(state, data) {
-    state.searchList = data;
+    state.searchList = data||[];
   },
   ADDTAGCATE(state, tag) {
     // 添加分类标签
@@ -34,7 +34,7 @@ const actions = {
     // 根据分类cateId搜索后会添加一个tag标签
     let result = await getProByCateId({ cateId: params.cateid * 1 });
     if (result.status === 200) {
-      commit("UPDATESEARCHLIST", result.data);
+      commit("UPDATESEARCHLIST", result.data)
       commit("ADDTAGCATE", {
         name: params.catename,
         type: "warning",
@@ -44,7 +44,7 @@ const actions = {
           cateName: params.catename,
         },
       })
-    } else if (result.status === 500) {
+    } else if (result.status === 201) {
       // 如果搜索结果为空则清空搜索列表，添加tag标签，页面返回提示信息
       commit("CLEARSEARCHLIST")
       commit("ADDTAGCATE", {
@@ -73,7 +73,7 @@ const actions = {
           cateName: item.cateName,
         },
       })
-    } else if (result.status === 500) {
+    } else if (result.status === 201) {
       // 如果搜索结果为空则清空搜索列表，添加tag标签，页面返回提示信息
       commit("CLEARSEARCHLIST")
       commit("ADDTAGCATE", {
@@ -89,12 +89,12 @@ const actions = {
   },
   //点击tag搜索商品
   async searchByTag({ commit }, params = {}) {
-    // 根据分类cateId搜索后会添加一个tag标签
+    // 根据对应的cateId或keyWord搜索商品
     if (params.cateid) {
       let result = await getProByCateId({ cateId: params.cateid * 1 });
       if (result.status === 200) {
         commit("UPDATESEARCHLIST", result.data);
-      } else if (result.status === 500) {
+      } else if (result.status === 201) {
         // 如果搜索结果为空则清空搜索列表，页面返回提示信息
         commit("CLEARSEARCHLIST")
       }
@@ -102,12 +102,11 @@ const actions = {
       let result = await searchPro({ keyWord: params.keyWord });
       if (result.status === 200) {
         commit("UPDATESEARCHLIST", result.data);
-      } else if (result.status === 500) {
+      } else if (result.status === 201) {
         // 如果搜索结果为空则清空搜索列表，页面返回提示信息
         commit("CLEARSEARCHLIST")
       }
     }
-
   },
   // 获取全部商品
   async getAllProduct({ commit }) {
@@ -128,7 +127,7 @@ const actions = {
         type: "warning",
         keyWord: keyWord
       })
-    } else if (result.status === 500) {
+    } else if (result.status === 201) {
       // 如果搜索结果为空则清空搜索列表，添加tag标签，页面返回提示信息
       commit("CLEARSEARCHLIST")
       commit("ADDTAGKEYWORD", {

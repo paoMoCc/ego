@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="login">
       <div class="header">
         <span>注册账户</span>
@@ -210,6 +210,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+ .container {
+  width: 100%;
+  height: 723px;
+  background: url("../../assets/1.png") no-repeat center;
+  background-size: 100% 100%;
+  position: absolute;
+  z-index: 1;
+} 
 .header {
   margin: -10px 0 20px;
   justify-content: space-around;
@@ -234,6 +242,7 @@ export default {
   padding: 40px;
   border-radius: 10px;
   box-shadow: 0 0 8px;
+  background-color: rgba($color: #fff, $alpha: 0.1);
 
   .form {
     display: flex;

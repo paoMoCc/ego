@@ -111,6 +111,49 @@
           </div>
         </div>
       </el-tab-pane>
+
+      <el-tab-pane class="updatePwd" label="修改密码">
+        <el-form
+          :model="ruleForm"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="旧密码" prop="oldPass">
+            <el-input
+              type="password"
+              v-model.number="ruleForm.oldPass"
+              autocomplete="off"
+              show-password
+            ></el-input>
+          </el-form-item>
+
+          <el-form-item label="新密码" prop="pass">
+            <el-input
+              type="password"
+              v-model="ruleForm.pass"
+              autocomplete="off"
+              show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input
+              type="password"
+              v-model="ruleForm.checkPass"
+              autocomplete="off"
+              show-password
+            ></el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')"
+              >提交</el-button
+            >
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
     <!-- 右侧日历小挂件 -->
     <div class="side-bar">
@@ -127,7 +170,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 import { validNickName, validPhone } from "../../../utils/validate/user";
 export default {
   data() {
@@ -146,6 +189,35 @@ export default {
       } else if (!validPhone(value)) callback(new Error("11位数字"));
       else callback();
     };
+    var validateOldPass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入旧密码"));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入新密码"));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入新密码"));
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error("新密码两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       headers: {
         Authorization: this.$store.state.user.token,
@@ -158,11 +230,25 @@ export default {
         ],
         phone: [{ validator: validatePhone, trigger: "blur", required: true }],
       },
+      // 修改密码
+      ruleForm: {
+        pass: "",
+        checkPass: "",
+        oldPass: "",
+      },
+      rules: {
+        pass: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        oldPass: [{ validator: validateOldPass, trigger: "blur" }],
+      },
     };
   },
   computed: {
     ...mapState({
-      userImg: (state) => state.user.userInfo.userImg?state.user.userInfo.userImg:"https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
+      userImg: (state) =>
+        state.user.userInfo.userImg
+          ? state.user.userInfo.userImg
+          : "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
     }),
     time() {
       let time = {};
@@ -253,6 +339,45 @@ export default {
       }
       return isAvailable && isLt10M;
     },
+    // 修改密码
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$api
+            .resetPassWord({
+              oldPassWord: this.ruleForm.oldPass+'',
+              newPassWord: this.ruleForm.checkPass+'',
+            })
+            .then((res) => {
+              this.$refs[formName].resetFields();
+              if (res.status === 200) {
+                // 修改成功后退出登录
+                this.$store.commit("CLEAR");
+                this.$message({
+                  showClose: true,
+                  message: res.message,
+                  type: "success",
+                });
+                // 刷新页面
+                location.reload();
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: res.message,
+                  type: "error",
+                });
+                console.log(res.message);
+              }
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    },
   },
   mounted() {
     this.userInfo = { ...this.$store.state.user.userInfo };
@@ -293,7 +418,7 @@ export default {
   }
   // 用户头像
   .userAvatar {
-    height: 440px;
+    height: 450px;
     display: flex;
     justify-content: space-between;
     // 左侧
@@ -342,6 +467,10 @@ export default {
         }
       }
     }
+  }
+  // 修改密码
+  .updatePwd {
+    height: 450px;
   }
   // 右侧日历装饰小挂件
   .side-bar {

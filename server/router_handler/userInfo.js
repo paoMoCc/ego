@@ -39,7 +39,7 @@ exports.updatePassWord = (req,res)=>{
         if (results.length !== 1) res.cc("用户不存在")
         // 判断用户输入的旧密码是否正确
         const compareResult = bcrypt.compareSync(req.body.oldPassWord,results[0].passWord)
-        if (!compareResult) return res.cc('原密码错误！',500)
+        if (!compareResult) return res.cc('旧密码错误！',500)
         // 定义重置密码sql语句
         const sql = `update user set passWord=?,updateTime=? where userId=?`
         // 给新密码加密

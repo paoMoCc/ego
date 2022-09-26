@@ -26,11 +26,11 @@ export default [
         {
           path: '/center/cart',
           name:'cart',
-          component: () => import('../views/Center/Cart/index.vue')
+          component: () => import('../views/Center/Cart/index.vue'),
         },
         {
-          path: '/center/myorder',
-          name:'myorder',
+          path: '/center/myOrder',
+          name:'myOrder',
           component: () => import('../views/Center/MyOrder/index.vue')
         },
         {
@@ -42,6 +42,11 @@ export default [
           path: '/center/address',
           name:'address',
           component: () => import('../views/Center/Address/index.vue')
+        },
+        {
+          path: '/center/orderDetail',
+          name:'orderDetail',
+          component: () => import('../views/Center/MyOrder/orderDetail/index.vue')
         },
       ]
     },
@@ -59,26 +64,26 @@ export default [
 
   {
     path: '/trade',
+    name:'trade',
     component: () => import('../views/Trade/index.vue'),
     /* 只能从购物车界面, 才能跳转到交易界面 */
     beforeEnter (to, from, next) {
-      if (from.path==='/cart') {
+      if (from.path==='/center/cart'||from.path==='/detail') {
         next()
       } else {
-        next('/cart')
+        next('/center/cart')
       }
     }
   },
   {
     path: '/pay',
     component: () => import('../views/Pay/index.vue'),
-
+    name:'pay',
     // 将query参数映射成props传递给路由组件
-    props: route => ({orderId: route.query.orderId}),
-
+    // props: true,
     /* 只能从交易界面, 才能跳转到支付界面 */
     beforeEnter (to, from, next) {
-      if (from.path==='/trade') {
+      if (from.path==='/trade'||from.path==='/center/myOrder') {
         next()
       } else {
         next('/trade')
@@ -87,7 +92,8 @@ export default [
   },
   
   {
-    path: '/paysuccess',
+    path: '/paySuccess',
+    name:'paySuccess',
     component: () => import('../views/PaySuccess/index.vue'),
     /* 只有从支付界面, 才能跳转到支付成功的界面 */
     beforeEnter (to, from, next) {

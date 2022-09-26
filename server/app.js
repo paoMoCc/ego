@@ -41,7 +41,7 @@ app.use(function (req, res, next) {
     next()
 })
 // 使用 .unless({ path: [/^\/api\//] }) 指定哪些接口不需要进行 Token 的身份认证                  除了用户接口，获取分类，根据分类获取全部商品，获取全部在售商品，搜索商品
-app.use(expressjwt({ secret: config.jwtSecretKey,algorithms: ['HS256'] }).unless({ path: [/^\/user\/|\/cate\/getCate|\/product\/getPro|\/product\/getAllPro|\/product\/searchPro|\/userAvatars\/|\/productImgs\//] }))
+app.use(expressjwt({ secret: config.jwtSecretKey,algorithms: ['HS256'] }).unless({ path: [/^\/user\/|\/cate\/getCate|\/product\/getPro|\/product\/getAllPro|\/product\/searchPro|\/userAvatars\/|\/productImgs\/|\/comment\/getComment/] }))
 
 // 配置路由,以 /my 开头的接口，都是有权限的接口，需要进行 Token 身份认证
 app.use('/user', userRouter)

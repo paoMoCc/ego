@@ -8,9 +8,9 @@
     <section class="con">
       <!-- 主要内容区域 -->
       <div class="mainCon">
-        <!-- 左侧放大镜区域 -->
+        <!-- 左侧轮播图区域 -->
         <div class="previewWrap">
-          <el-carousel height="435px">
+          <el-carousel height="450px">
             <el-carousel-item v-for="(item, index) in imgList" :key="index">
               <img :src="item" />
             </el-carousel-item>
@@ -32,8 +32,8 @@
                   <span>降价通知</span>
                 </div>
                 <div class="remark">
-                  <i>累计评价</i>
-                  <em>65545</em>
+                  <i>库存：</i>
+                  <em>{{ product.stock }}</em>
                 </div>
               </div>
               <div class="priceArea2">
@@ -80,7 +80,12 @@
               >
             </div>
             <div class="wanted">
-              <el-button type="danger" @click="buyNow">立即购买</el-button>
+              <el-button
+                type="danger"
+                @click="buyNow"
+                v-loading.fullscreen.lock="fullscreenLoading"
+                >立即购买</el-button
+              >
               <el-button type="danger" @click="addCart"
                 ><i class="el-icon-shopping-cart-2"></i>加入购物车</el-button
               >
@@ -89,6 +94,82 @@
         </div>
       </div>
     </section>
+
+    <div class="line"></div>
+
+    <!-- 评价区域 -->
+    <div class="eval">
+      <!-- 写评价 -->
+      <div class="coment" v-if="isShow">
+        <div class="left">
+          <img :src="imgList[0]" alt="" />
+          <div class="box">
+            <p class="name">{{ product.proName }}</p>
+            <p class="price">
+              ￥{{ product.totalPrice }}
+              <span style="margin-left: 40px"
+                >共：{{ product.quantity }}件</span
+              >
+            </p>
+          </div>
+        </div>
+        <div class="right">
+          <div class="rate">
+            <span>商品满意度</span>
+            <el-rate v-model="rate" show-text :colors="colors"></el-rate>
+          </div>
+          <div class="textArea">
+            <span>发表评价</span>
+            <el-input
+              type="textarea"
+              placeholder="请输入内容"
+              v-model="textarea"
+              maxlength="200"
+              :autosize="{ minRows: 3, maxRows: 4 }"
+              show-word-limit
+              :autofocus="true"
+            >
+            </el-input>
+          </div>
+          <div class="bottom">
+            <el-button class="btn" type="danger" @click="evaluate"
+              >提交</el-button
+            >
+          </div>
+        </div>
+      </div>
+      <!-- 评论区 -->
+      <div class="rates">
+        <div class="topBar">
+          <el-radio-group v-model="radio" @change="switchTab">
+            <el-radio label="all">全部</el-radio>
+            <el-radio label="good">好评</el-radio>
+            <el-radio label="normal">中评</el-radio>
+            <el-radio label="bad">差评</el-radio>
+          </el-radio-group>
+          <span class="count">累计评论：{{ review.all.length }}条</span>
+        </div>
+        <!-- 评论列表 -->
+        <div class="table" v-for="item in reviewList" :key="item.comentId">
+          <div class="left">
+            <p class="txt">{{ item.content }}</p>
+            <p class="date">{{ item.createTime | datefmt("YYYY/MM/DD") }}</p>
+          </div>
+          <div class="score">
+            <el-rate v-model="item.rate" disabled text-color="#ff9900">
+            </el-rate>
+          </div>
+          <div class="right">
+            <el-avatar class="avatar" :src="item.userImg"></el-avatar>
+            <p class="name">
+              {{ item.userName }} <span>({{ item.nickName }})</span>
+            </p>
+          </div>
+          <!-- 空状态 -->
+        </div>
+        <div class="null" v-if="!reviewList.length">什么都没有找到~~</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,10 +180,21 @@ export default {
   name: "Detail",
   data() {
     return {
+      fullscreenLoading: false,
+      // 写评论区是否显示
+      isShow: false,
       product: {},
-      imgList: [],
       //购买产品的个数
       num: 1,
+      // 写评论区域
+      rate: null,
+      colors: ["#99A9BF", "#F7BA2A", "#FF9900"],
+      textarea: "",
+      // 评论区
+      radio: "all",
+      // 评论列表
+      reviewList: [],
+      iconClasses: ["icon-rate-face-1", "icon-rate-face-2", "icon-rate-face-3"],
     };
   },
   components: {
@@ -111,25 +203,58 @@ export default {
   mounted() {
     //派发action获取产品详情的信息
     this.product = this.$route.query;
-    // 加工一下数据库存储的img路径
-    let arr = [];
-    arr = this.product.productImgs.split("@");
-    this.imgList = arr.map(
-      (item) => `http://127.0.0.1:8081/productImgs/${item}`
-    );
+    // 判断是否显示写评论区域
+    this.product.orderId && (this.isShow = true);
+    this.$store.dispatch("getComents", this.product.proId).then(() => {
+      this.reviewList = this.review.all;
+    });
   },
   computed: {
     // 用户是否登录
     ...mapGetters(["isLogin"]),
+    imgList() {
+      // 加工一下数据库存储的img路径
+      let arr = [];
+      if (this.product.productImgs) {
+        arr = this.product.productImgs.split("@");
+        return arr.map((item) => `http://127.0.0.1:8081/productImgs/${item}`);
+      }
+    },
+    ...mapState({
+      review: (state) => state.evaluate.review,
+    }),
   },
   methods: {
+    // 筛选评论
+    switchTab(value) {
+      this.reviewList = this.review[value].sort((a, b) => {
+        return (
+          new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
+        );
+      });
+      console.log(this.review, this.reviewList);
+    },
     // 立即购买
     buyNow() {
-      alert("此功能待完善哦！");
+      this.fullscreenLoading = true;
+      let product = this.product;
+      product.uniPrice = product.price * 1;
+      // product.price = product.price*this.num
+      product.quantity = this.num;
+      setTimeout(() => {
+        this.fullscreenLoading = false;
+        this.$router.push({
+          name: "trade",
+          query: {
+            total: this.product.price * this.num,
+            checkList: [this.product],
+            buyNow: true,
+          },
+        });
+      }, 2000);
     },
     //加入购物车
     async addCart() {
-      // console.log(this.$store.state.user.userInfo);
       // 如果还没登录就先去登录，成功后回到当前页面
       if (!this.isLogin) {
         this.$router.push({
@@ -150,12 +275,12 @@ export default {
             // 添加购物车成功
             if (res.status === 200) {
               // 更新购物车列表
-              this.$store.dispatch("getCartList")
+              this.$store.dispatch("getCartList");
               this.$message({
-              showClose: true,
-              message: res.message,
-              type: "success",
-            });
+                showClose: true,
+                message: res.message,
+                type: "success",
+              });
             } else {
               this.$message({
                 showClose: true,
@@ -165,32 +290,49 @@ export default {
             }
           })
           .catch((error) => console.log(error));
-        // try {
-        //   //成功
-        //   let res = await this.$store.dispatch("addInCart", {
-        //     proId: this.product.proId*1,
-        //     productImgs: this.product.productImgs,
-        //     quantity: "",
-        //   });
-        //   if (res.status === 200){
-        //      this.$message({
-        //       showClose: true,
-        //       message: res.message,
-        //       type: "success",
-        //     });
-        //   }else{
-        //     this.$message({
-        //       showClose: true,
-        //       message: res.message,
-        //       type: "error",
-        //     });
-        //   }
-        // } catch (error) {
-        //   //失败
-        //   alert(error.message);
-        // }
       }
     },
+    // 评价订单
+    evaluate() {
+      if (this.textarea.trim() == "") {
+        this.$message({
+          showClose: true,
+          message: "评论内容不能为空哦！",
+          type: "error",
+        });
+      } else {
+        this.$api
+          .evaluate({
+            proId: this.product.proId,
+            orderId: this.product.orderId,
+            content: this.textarea,
+            rate: this.rate * 1,
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              // 关闭写评论区域
+              this.isShow = false;
+              // 评价成功之后重新获取评价列表
+              this.$store.dispatch("getComents", this.product.proId);
+              this.$message({
+                showClose: true,
+                message: res.message,
+                type: "success",
+              });
+            } else {
+              this.$message({
+                showClose: true,
+                message: res.message,
+                type: "error",
+              });
+            }
+            // 清空表单
+            this.rate = null;
+            this.textarea = "";
+          });
+      }
+    },
+    // 删除评论
   },
 };
 </script>
@@ -210,6 +352,7 @@ export default {
         width: 450px;
         position: relative;
         img {
+          height: 100%;
           width: 100%;
         }
       }
@@ -344,6 +487,136 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .line {
+    width: 100%;
+    height: 2px;
+    background-color: #e1251b;
+    margin-bottom: 15px;
+  }
+  .eval {
+    .coment {
+      width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      .left {
+        width: 400px;
+        padding: 20px;
+        display: flex;
+        position: relative;
+        text-align: start;
+        border: 1px solid #ccc;
+        .orderNum {
+          position: absolute;
+        }
+        img {
+          width: 150px;
+          height: 150px;
+          border-radius: 8px;
+          margin-right: 10px;
+        }
+        .box {
+          width: 180px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          .name {
+          }
+          .price {
+            color: red;
+          }
+        }
+      }
+      .right {
+        width: 800px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .rate {
+          display: flex;
+          span {
+            width: 60px;
+            margin-right: 50px;
+          }
+        }
+        .textArea {
+          width: 750px;
+          display: flex;
+          span {
+            width: 70px;
+            margin-right: 50px;
+          }
+        }
+        .bottom {
+          display: flex;
+          .btn {
+            margin-left: 110px;
+          }
+        }
+      }
+    }
+    .rates {
+      width: 1200px;
+      margin: 15px auto;
+      .topBar {
+        height: 25px;
+        line-height: 25px;
+        background-color: rgba($color: #ccc, $alpha: 0.2);
+        padding-left: 5px;
+      }
+      .count {
+        font-size: 14px;
+        line-height: 25px;
+        margin-left: 720px;
+      }
+    }
+    .table {
+      min-height: 130px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ccc;
+      & > * {
+        padding: 16px 7px;
+      }
+      .left {
+        width: 600px;
+        min-height: 99px;
+        padding: 16px 30px 16px 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .date {
+          color: #ccc;
+        }
+      }
+      .score {
+        width: 400px;
+        text-align: center;
+      }
+      .right {
+        width: 200px;
+        padding: 16px 0 16px 24px;
+        display: flex;
+        .name {
+          font-size: 14px;
+          margin: 20px 0 0 10px;
+          & > span {
+            font-size: 12px;
+            color: #ccc;
+          }
+        }
+      }
+    }
+    .null {
+      min-height: 132px;
+      font-size: 20px;
+      line-height: 130px;
+      text-align: center;
+      margin: 0 auto;
     }
   }
 }

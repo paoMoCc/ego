@@ -33,7 +33,7 @@
       class="cart"
       :value="cartListLen"
       type="danger"
-      :hidden="!isLogin"
+      :hidden="!isLogin||cartListLen===0"
     >
       <p class="box">
         <i class="el-icon-shopping-cart-2"></i>
@@ -48,7 +48,6 @@ import { mapGetters } from "vuex";
 export default {
   name: "SearchBar",
   data() {
-    var that = this;
     return {
       keyWord: "",
     };
@@ -62,8 +61,8 @@ export default {
           params: { keyWord: this.keyWord || undefined },
         };
         //代表的是如果有query参数也带过去
-        loction.query = this.$route.query;
-        this.$router.push(loction);
+        // loction.query = this.$route.query;
+        this.$router.push(loction)
         this.$store.dispatch("searchBykeyWord", this.$route.params.keyWord);
       } else if (this.$route.path === "/search") {
         this.$store.dispatch("searchBykeyWord", this.keyWord);

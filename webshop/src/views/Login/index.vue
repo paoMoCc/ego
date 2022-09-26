@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <!-- <div class="bg"></div> -->
     <div class="login">
       <div class="header">
         <span>系统登录</span>
@@ -253,14 +252,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
-/* .bg {
+ .container {
   width: 100%;
-  height: 100%;
+  height: 723px;
   background: url("../../assets/1.png") no-repeat center;
-  position: fixed;
   background-size: 100% 100%;
-  filter: blur(8px);
-} */
+  position: absolute;
+  z-index: 1;
+} 
 .header{
   margin: -10px 0 20px;
   justify-content: space-around;
@@ -285,6 +284,7 @@ export default {
   padding: 40px;
   border-radius: 10px;
   box-shadow: 0 0 8px;
+  background-color: rgba($color: #fff, $alpha: 0.1);
 
   &>*{
   justify-content: space-between;

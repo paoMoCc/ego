@@ -74,13 +74,15 @@ export const deleteAddress = (addressId) => axios({ url: '/address/deleteAddress
 // order
 
 // 获取订单
-export const getOrder = (type) => axios({ url: '/order/getOrder', method: 'get', data: { type } })
+export const getOrder = (type) => axios({ url: '/order/getOrder', method: 'post', data: { type } })
 // 取消订单 传递一个数组
 export const cancelOrder = (cancelOrderIds) => axios({url: '/order/cancelOrder', method: 'post', data: {cancelOrderIds}})
 // 发货
 export const sendPro = (orderId) => axios({ url: '/order/sendPro', method: 'post', data: { orderId } })
 // 收货
 export const receivePro = (orderId) => axios({ url: '/order/receivePro', method: 'post', data: { orderId } })
+// 删除订单
+export const delOrder = (orderId) => axios({ url: '/order/delOrder', method: 'post', data: { orderId } })
 
 
 // payInfo
@@ -91,6 +93,8 @@ export const pay = (data) => axios({ url: '/payinfo/pay', method: 'post', data }
 export const repay = (data) => axios({ url: '/payinfo/repay', method: 'post', data })
 // 获取支付信息
 export const getPayinfo = (data) => axios({ url: '/payinfo/getPayinfo', method: 'get', data })
+//立即购买
+export const buyNow = (data) => axios({ url: '/payinfo/buyNow', method: 'post', data })
 
 
 // comment
@@ -100,4 +104,4 @@ export const evaluate = (data) => axios({ url: '/comment/eval', method: 'post', 
 // 删除评价
 export const delComment = (commentId) => axios({ url: '/comment/delComment', method: 'delete', data: { commentId } })
 // 获取评价
-export const getComment = (proId) => axios({ url: '/comment/getComment', method: 'get', data: { proId } })
+export const getComment = (proId) => axios({ url: '/comment/getComment', method: 'post', data: { proId } })

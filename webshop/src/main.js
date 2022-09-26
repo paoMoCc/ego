@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import moment from 'moment'
 import ajax from './api/ajax';
 import * as api from '@/api';
 //定义全局组件：在入口文件注册一次之后，在任何组件当中都可以使用
@@ -26,6 +27,12 @@ Vue.prototype.$axios = ajax
 window.addEventListener('storage', function (e) {
   sessionStorage.setItem(e.key,e.oldValue)
 });
+
+
+// 定义一个全局过滤器实现日期格式化
+Vue.filter('datefmt', function (input, fmtstring) {
+  return moment(new Date(input).getTime()).format(fmtstring)
+})
 
 new Vue({
   //全局事件总线$bus配置

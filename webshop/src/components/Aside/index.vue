@@ -19,7 +19,7 @@
             <span slot="title">购物车</span>
         </el-menu-item>
 
-        <el-menu-item index="/center/myorder">
+        <el-menu-item index="/center/myOrder">
           <i class="el-icon-tickets"></i>
           <span slot="title">我的订单</span>
         </el-menu-item>

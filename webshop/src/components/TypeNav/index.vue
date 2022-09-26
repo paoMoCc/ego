@@ -7,14 +7,21 @@
         <transition name="sort">
           <div class="sort" v-show="show">
             <div class="all-sort-list2" @click="goSearch">
-              <div class="item" v-for="(c1,index) in categoryList" :key="c1.cateId">
+              <div
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.cateId"
+              >
                 <h3
                   :class="{ cur: currentIndex == index }"
                   @mouseenter="changeIndex(index)"
                 >
-                  <a :data-cateName="c1.cateName" :data-cateId="c1.cateId" :data-rootId="c1.rootId">{{
-                    c1.cateName
-                  }}</a>
+                  <a
+                    :data-cateName="c1.cateName"
+                    :data-cateId="c1.cateId"
+                    :data-rootId="c1.rootId"
+                    >{{ c1.cateName }}</a
+                  >
                 </h3>
                 <div
                   class="item-list clearfix"
@@ -31,10 +38,7 @@
                         >
                       </dt>
                       <dd>
-                        <em
-                          v-for="c3 in c2.child"
-                          :key="c3.cateId"
-                        >
+                        <em v-for="c3 in c2.child" :key="c3.cateId">
                           <a
                             :data-cateName="c3.cateName"
                             :data-cateId="c3.cateId"
@@ -105,15 +109,15 @@ export default {
     }, 20),
     //进行路由跳转的回调函数
     goSearch(event) {
-      let params = event.target.dataset
-      this.$store.dispatch("searchByCate",params)
-      this.$router.push({name:'search',params})
+      let params = event.target.dataset;
+      this.$store.dispatch("searchByCate", params);
+      this.$router.push({ name: "search", params });
     },
     //当鼠标移入的时候，让商品分类列表进行展示
     enterShow() {
       if (this.$route.path === "/home") {
         this.show = true;
-      }else this.show = false;
+      } else this.show = false;
     },
     //当鼠标离开的时候，让商品分类列表进行隐藏
     leaveShow() {
@@ -180,6 +184,7 @@ export default {
             overflow: hidden;
             padding: 0 20px;
             margin: 0;
+            text-align: center;
 
             a {
               color: #333;
@@ -222,8 +227,8 @@ export default {
                   text-align: right;
                   padding: 3px 6px 0 0;
                   font-weight: 700;
-                  
-                  &>a{
+
+                  & > a {
                     cursor: pointer;
                   }
                 }

@@ -40,17 +40,21 @@
       <!-- 如果搜索结果为空，则不显示该列表，显示提示信息 -->
       <el-row>
         <el-col :span="5" v-for="item in searchList" :key="item.proId">
-          <img :src="`http://127.0.0.1:8081/productImgs/${item.productImgs.split('@',1)}`" alt="" @click="gotoDetail(item)"/>
+          <img
+            :src="`http://127.0.0.1:8081/productImgs/${item.productImgs.split(
+              '@',
+              1
+            )}`"
+            alt=""
+            @click="gotoDetail(item)"
+          />
           <!-- <img v-lazy="good.defaultImg" /> -->
           <div class="info">
             <em>￥ </em><span>{{ item.price }}.00</span>
             <p>{{ item.proName }}</p>
           </div>
           <div class="operate">
-            <a
-              href="success-cart.html"
-              target="_blank"
-              class="sui-btn btn-bordered btn-danger"
+            <a class="sui-btn btn-bordered btn-danger" @click="addCart(item)"
               >加入购物车</a
             >
             <a href="javascript:void(0);" class="sui-btn btn-bordered">收藏</a>
@@ -61,7 +65,10 @@
 
     <!-- 提示信息，当搜索列表为空时显示 -->
     <div class="message" v-else>
-      <el-empty :image-size="250" description="哎呀！该分类还没有在售的商品~~"></el-empty>
+      <el-empty
+        :image-size="250"
+        description="哎呀！该分类还没有在售的商品~~"
+      ></el-empty>
     </div>
 
     <!-- <button @click="show">testShow</button> -->
@@ -70,7 +77,7 @@
 
 <script>
 import SearchBar from "../../components/SearchBar";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
   name: "Search",
   components: { SearchBar },
@@ -90,14 +97,52 @@ export default {
     isSearchListNull() {
       return this.searchList.length === 0;
     },
+    ...mapGetters(["isLogin"]),
   },
   methods: {
-    show() {
-      console.log(this);
+    //加入购物车
+    async addCart(item) {
+      // console.log(this.$store.state.user.userInfo);
+      // 如果还没登录就先去登录，成功后回到当前页面
+      if (!this.isLogin) {
+        this.$router.push({
+          path: "/login",
+          query: {
+            redirect: this.$router.currentRoute.fullPath,
+          },
+        });
+      } else {
+        // 如果已经登录
+        this.$api
+          .addToCart({
+            proId: item.proId * 1,
+            productImgs: item.productImgs,
+            quantity: 1,
+          })
+          .then((res) => {
+            // 添加购物车成功
+            if (res.status === 200) {
+              // 更新购物车列表
+              this.$store.dispatch("getCartList");
+              this.$message({
+                showClose: true,
+                message: res.message,
+                type: "success",
+              });
+            } else {
+              this.$message({
+                showClose: true,
+                message: res.message,
+                type: "error",
+              });
+            }
+          })
+          .catch((error) => console.log(error));
+      }
     },
     // 删除tag回调函数
     handleClose(index) {
-      let lastTag = this.tags[this.tags.length - 1];
+      // let lastTag = this.tags[this.tags.length - 2];
       // 移除仓库中对应的tag元素
       this.$store.commit("DELETETAG", index);
     },
@@ -118,8 +163,8 @@ export default {
     handleDown(c2) {
       this.$store.dispatch("searchByDropDown", c2);
     },
-    gotoDetail(item){
-      this.$router.push({name:'detail',query:item})
+    gotoDetail(item) {
+      this.$router.push({ name: "detail", query: item });
     },
   },
   mounted() {

@@ -53,36 +53,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .footer-container {
-    background-color: #eaeaea;
-    width: 100%;
-    position: relative;
-    bottom: 0;
-    margin: 0 auto;
+.footer-container {
+  background-color: #eaeaea;
+  width: 100%;
+  height: 100px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  
 
-    .copyright {
-      padding: 10px;
+  .copyright {
+    padding: 10px 10px 0 10px;
 
-      .helpLink {
-        text-align: center;
+    .helpLink {
+      text-align: center;
 
-        li {
-          display: inline;
+      li {
+        display: inline;
 
-          .space {
-            border-left: 1px solid #666;
-            width: 1px;
-            height: 13px;
-            background: #666;
-            margin: 8px 10px;
-          }
+        .space {
+          border-left: 1px solid #666;
+          width: 1px;
+          height: 13px;
+          background: #666;
+          margin: 8px 10px;
         }
       }
+    }
 
-      p {
-        margin: 15px 0;
-        text-align: center;
-      }
+    p {
+      margin: 15px 0;
+      text-align: center;
     }
   }
+}
 </style>
