@@ -51,8 +51,8 @@ exports.cancelOrder = (req, res) => {
 // 获取订单信息 订单状态:0-已取消-10-未付款，20-已付款（待发货），30-待收货（已发货），40-待评价（已收货）,50-已评价
 exports.getOrder = (req, res) => {
     let type = req.body.type
-    let sql1 = `select o.orderId,o.addressId,o.status,o.orderNum,o.quantity,o.totalPrice,o.payTime,o.sendTime,o.endTime,o.closeTime,o.createTime,o.updateTime,p.proId,p.proName,p.subTitle,p.productImgs,p.detail,p.price,p.stock,a.name,a.phone,a.area,a.detailAdd,f.payForm,f.payNum,f.payStatus from orders o inner join product p on (o.proId = p.proId) inner join address a on (o.addressId = a.addressId) inner join payinfo f on (o.orderId = f.orderId) where o.userId=${req.auth.userId} and o.status=${type} and not o.status=-1`
-    let sql2 = `select o.orderId,o.addressId,o.status,o.orderNum,o.quantity,o.totalPrice,o.payTime,o.sendTime,o.endTime,o.closeTime,o.createTime,o.updateTime,p.proId,p.proName,p.subTitle,p.productImgs,p.detail,p.price,p.stock,a.name,a.phone,a.area,a.detailAdd,f.payForm,f.payNum,f.payStatus from orders o inner join product p on (o.proId = p.proId) inner join address a on (o.addressId = a.addressId) inner join payinfo f on (o.orderId = f.orderId) where o.userId=${req.auth.userId} and not o.status=-1`
+    let sql1 = `select o.orderId,o.addressId,o.status,o.orderNum,o.quantity,o.totalPrice,o.payTime,o.sendTime,o.endTime,o.closeTime,o.createTime,o.updateTime,p.proId,p.proName,p.subTitle,p.productImgs,p.detail,p.price,p.stock,a.name,a.phone,a.area,a.detailAdd,f.payForm,f.payNum,f.payStatus from orders o inner join product p on (o.proId = p.proId) inner join address a on (o.addressId = a.addressId) inner join payinfo f on (o.orderId = f.orderId) where o.userId=${req.auth.userId} and o.status=${type} and not o.status=-1 order by o.createTime desc`
+    let sql2 = `select o.orderId,o.addressId,o.status,o.orderNum,o.quantity,o.totalPrice,o.payTime,o.sendTime,o.endTime,o.closeTime,o.createTime,o.updateTime,p.proId,p.proName,p.subTitle,p.productImgs,p.detail,p.price,p.stock,a.name,a.phone,a.area,a.detailAdd,f.payForm,f.payNum,f.payStatus from orders o inner join product p on (o.proId = p.proId) inner join address a on (o.addressId = a.addressId) inner join payinfo f on (o.orderId = f.orderId) where o.userId=${req.auth.userId} and not o.status=-1 order by o.createTime desc`
     db.query(type ? sql1 : sql2, (err, results) => {
         if (err) return res.cc(err, 500)
         if (results.length < 1) return res.cc('查询结果为空！', 201)
@@ -65,15 +65,33 @@ exports.getOrder = (req, res) => {
 }
 // 发货
 exports.sendPro = (req, res) => {
-    db.query(`update orders set status=30,sendTime=? where orderId=${req.body.orderId}`, getCurrentTime, (err, results) => {
-        if (err) return res.cc(err)
-        if (results.affectedRows !== 1) return res.cc("发货失败！", 500)
-        res.cc('发货成功！', 200)
-    })
+    let promiseArr = []
+    let orderId = req.body.orderId
+    if (!isNaN(orderId*1)) {
+        db.query(`update orders set status=30,sendTime=?,updateTime=? where orderId=${orderId}`, [getCurrentTime,getCurrentTime], (err, results) => {
+            if (err) return res.cc(err)
+            if (results.affectedRows !== 1) return res.cc("发货失败！", 500)
+            res.cc('发货成功！', 200)
+        })
+    }else if (orderId instanceof Array){
+        orderId.forEach(item => {
+            promiseArr.push(new Promise((resolve,reject)=>{
+                db.query(`update orders set status=30,sendTime=?,updateTime=? where orderId=${item}`, [getCurrentTime,getCurrentTime], (err, results) => {
+                    if (err || results.affectedRows !== 1) reject(err ? err : new Error('sql执行错误，发货失败！')); 
+                    resolve()
+                })
+            }))
+        })
+        Promise.all(promiseArr).then(()=>{
+            res.cc('发货成功！', 200)
+        }).catch((err)=>{
+            res.cc(err ? err : "发货失败！", 500)
+        })
+    }
 }
 // 收货
 exports.receivePro = (req, res) => {
-    db.query(`update orders set status=40,endTime=? where userId=${req.auth.userId} and orderId=${req.body.orderId}`, getCurrentTime, (err, results) => {
+    db.query(`update orders set status=40,endTime=?,updateTime=? where userId=${req.auth.userId} and orderId=${req.body.orderId}`, [getCurrentTime,getCurrentTime], (err, results) => {
         if (err) return res.cc(err)
         if (results.affectedRows !== 1) return res.cc("收货失败！", 500)
         res.cc('收货成功！', 200)
@@ -81,9 +99,27 @@ exports.receivePro = (req, res) => {
 }
 // 删除订单
 exports.delOrder = (req,res)=>{
-    db.query(`update orders set status=-1,updateTime=? where userId=${req.auth.userId} and orderId=${req.body.orderId}`,getCurrentTime,(err,results)=>{
-        if (err) res.cc(err)
-        if (results.affectedRows !== 1) res.cc("删除订单失败！",500)
-        res.cc("删除订单成功！",200)
-    })
+    let promiseArr = []
+    let orderId = req.body.orderId
+    if (!isNaN(orderId*1)) {
+        db.query(`update orders set status=-1,updateTime=? where userId=${req.auth.userId} and orderId=${orderId}`,getCurrentTime,(err,results)=>{
+            if (err) res.cc(err)
+            if (results.affectedRows !== 1) res.cc("删除订单失败！",500)
+            res.cc("删除订单成功！",200)
+        })
+    }else if (orderId instanceof Array){
+        orderId.forEach(item => {
+            promiseArr.push(new Promise((resolve,reject)=>{
+                db.query(`update orders set status=-1,updateTime=? where userId=${req.auth.userId} and orderId=${item}`,getCurrentTime,(err,results)=>{
+                    if (err || results.affectedRows !== 1) reject(err ? err : new Error('sql执行错误，删除订单失败！')); 
+                    resolve()
+                })
+            }))
+        })
+        Promise.all(promiseArr).then(()=>{
+            res.cc('删除订单成功！', 200)
+        }).catch((err)=>{
+            res.cc(err ? err : "删除订单失败！", 500)
+        })
+    }
 }

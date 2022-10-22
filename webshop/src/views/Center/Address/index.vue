@@ -128,7 +128,6 @@ import {
   validName,
   validPhone,
 } from "../../../utils/validate/address";
-import { mapState } from "vuex";
 export default {
   data() {
     const validateDetailAdd = (rule, value, callback) => {
@@ -208,9 +207,14 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      tableData: (state) => state.order.address,
-    }),
+    tableData(){
+      let address = this.$store.state.order.address
+      if (address[0].noData) {
+        return []
+      }else{
+        return address
+      }
+    }
   },
   methods: {
     // 解析地址

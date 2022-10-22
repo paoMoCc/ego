@@ -122,12 +122,13 @@ export default {
     dragVerify,
   },
   methods: {
-    gotoRegister(){
-      this.$router.push('/register')
+    gotoRegister() {
+      this.$router.push("/register");
     },
     // 管理员登录
     adminLogin() {
-      this.$api.userLogin({
+      this.$api
+        .userLogin({
           userName: this.form.userName,
           passWord: this.form.passWord,
           role: 0,
@@ -140,25 +141,25 @@ export default {
             this.$store.dispatch("getCartList");
             this.$message({
               showClose: true,
-              message: "登录成功！",
+              message: res.message,
               type: "success",
             });
             // 一秒后跳转到之前的页面或者去首页
-            setTimeout(()=>{
-              let path = '/home'
-              if(this.$route.query.redirect){
+            setTimeout(() => {
+              let path = "/home";
+              if (this.$route.query.redirect) {
                 // 跳转到之前页面
-                path = this.$route.query.redirect
+                path = this.$route.query.redirect;
               }
-              this.$router.push({path:path})
-            },1000)
+              this.$router.push({ path: path });
+            }, 1000);
           } else {
             console.log(res);
             // 清空表单
-            this.$refs['form'].resetFields();
+            this.$refs["form"].resetFields();
             this.$message({
               showClose: true,
-              message: "登录失败！",
+              message: res.message,
               type: "error",
             });
           }
@@ -168,7 +169,8 @@ export default {
 
     // 商家登录
     merchantLogin() {
-        this.$api.userLogin({
+      this.$api
+        .userLogin({
           userName: this.form.userName,
           passWord: this.form.passWord,
           role: 1,
@@ -181,25 +183,25 @@ export default {
             this.$store.dispatch("getCartList");
             this.$message({
               showClose: true,
-              message: "登录成功！",
+              message: res.message,
               type: "success",
             });
             // 一秒后跳转到之前的页面或者去首页
-            setTimeout(()=>{
-              let path = '/home'
-              if(this.$route.query.redirect){
+            setTimeout(() => {
+              let path = "/home";
+              if (this.$route.query.redirect) {
                 // 跳转到之前页面
-                path = this.$route.query.redirect
+                path = this.$route.query.redirect;
               }
-              this.$router.push({path:path})
-            },1000)
+              this.$router.push({ path: path });
+            }, 1000);
           } else {
             console.log(res);
             // 清空表单
-            this.$refs['form'].resetFields();
+            this.$refs["form"].resetFields();
             this.$message({
               showClose: true,
-              message: "登录失败！",
+              message: res.message,
               type: "error",
             });
           }
@@ -209,7 +211,8 @@ export default {
 
     // 用户登录
     userLogin() {
-      this.$api.userLogin({
+      this.$api
+        .userLogin({
           userName: this.form.userName,
           passWord: this.form.passWord,
           role: 2,
@@ -222,25 +225,25 @@ export default {
             this.$store.dispatch("getCartList");
             this.$message({
               showClose: true,
-              message: "登录成功！",
+              message: res.message,
               type: "success",
             });
             // 一秒后跳转到之前的页面或者去首页
-            setTimeout(()=>{
-              let path = '/home'
-              if(this.$route.query.redirect){
+            setTimeout(() => {
+              let path = "/home";
+              if (this.$route.query.redirect) {
                 // 跳转到之前页面
-                path = this.$route.query.redirect
+                path = this.$route.query.redirect;
               }
-              this.$router.push({path:path})
-            },1000)
+              this.$router.push({ path: path });
+            }, 1000);
           } else {
             console.log(res);
             // 清空表单
-            this.$refs['form'].resetFields();
+            this.$refs["form"].resetFields();
             this.$message({
               showClose: true,
-              message: "登录失败！",
+              message: res.message,
               type: "error",
             });
           }
@@ -252,23 +255,23 @@ export default {
 </script>
 
 <style scoped lang="scss">
- .container {
+.container {
   width: 100%;
   height: 723px;
   background: url("../../assets/1.png") no-repeat center;
   background-size: 100% 100%;
   position: absolute;
   z-index: 1;
-} 
-.header{
+}
+.header {
   margin: -10px 0 20px;
   justify-content: space-around;
 
-  &>*{
+  & > * {
     margin: 0 20px;
   }
 
-  &>span{
+  & > span {
     font-size: 15px;
     font-weight: bolder;
   }
@@ -286,14 +289,13 @@ export default {
   box-shadow: 0 0 8px;
   background-color: rgba($color: #fff, $alpha: 0.1);
 
-  &>*{
-  justify-content: space-between;
-
+  & > * {
+    justify-content: space-between;
   }
-  
-  .el-input{
-      width: 272px;
-    }
+
+  .el-input {
+    width: 272px;
+  }
 }
 
 .darg {

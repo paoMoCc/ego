@@ -33,7 +33,7 @@
           <router-link to="/center">个人中心</router-link>
           <router-link to="/center/myorder">我的订单</router-link>
           <router-link to="/center/cart">我的购物车</router-link>
-          <router-link to="/backend">商家后台</router-link>
+          <router-link to="/backend" v-if="isLogin&&!isUser">商家后台</router-link>
         </div>
       </div>
     </div>
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
   name: "Header",
   data() {
@@ -86,6 +87,7 @@ export default {
         ? userImg
         : "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png";
     },
+    ...mapGetters(["isUser","isLogin"])
   },
 };
 </script>

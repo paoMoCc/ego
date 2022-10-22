@@ -48,33 +48,35 @@ exports.login = (req, res) => {
     const sql = `select * from user where userName=? and role=?`
     db.query(sql, [userInfo.userName, userInfo.role], function (err, results) {
         // sql语句执行失败
-        if (err) return res.cc(err)
-        // sql执行成功但查询结果不为一
-        if (results.length !== 1) return res.cc('登陆失败！', 500)
-        // 如果用户状态正常
-        if (results[0].state === 0) {
-            // 判断用户输入的密码是否与数据库密码一致
-            const compareResult = bcrypt.compareSync(userInfo.passWord, results[0].passWord)
-            // 如果对比结果为false，证明用户输入的密码错误
-            if (!compareResult) return res.cc('登录失败')
-            // 登录成功，生成token
-            // 剔除掉不需要的值
-            const user = { ...results[0], passWord: undefined}
-            // 生成token字符串
-            const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: config.expiresIn })
-            res.send({
-                status: 200,
-                message: '登陆成功！',
-                // 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-                token: 'Bearer ' + tokenStr
-            })
-            // 如果用户已被删除
-        }else if(results[0].state === -1){
-            res.cc('账户不存在！')
-            // 如果用户已被封禁
-        }else if(results[0].state === 1){
-            res.cc("您的账户已被封禁")
+        if (err) res.cc(err)
+        else {
+            // 如果用户状态正常
+            if (results[0].state === 0) {
+                // 判断用户输入的密码是否与数据库密码一致
+                const compareResult = bcrypt.compareSync(userInfo.passWord, results[0].passWord)
+                // 如果对比结果为false，证明用户输入的密码错误
+                if (!compareResult) res.cc('登录失败!')
+                // 登录成功，生成token
+                // 剔除掉不需要的值
+                const user = { ...results[0], passWord: undefined }
+                // 生成token字符串
+                const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: config.expiresIn })
+                res.send({
+                    status: 200,
+                    message: '登陆成功！',
+                    // 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
+                    token: 'Bearer ' + tokenStr
+                })
+                // 如果用户已被删除
+            } else if (results[0].state === -1) {
+                res.cc('账户不存在！')
+                // 如果用户已被封禁
+            } else if (results[0].state === 1) {
+                res.cc("登陆失败，您的账户已被封禁！")
+            }
         }
+
+
     })
 
 }

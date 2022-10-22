@@ -21,7 +21,7 @@ exports.addCate = (req, res) => {
 }
 //获取所有分类
 exports.getCate = (req,res) => {
-    const sql = `select * from category where status=1`
+    const sql = `select * from category where status=1 and isPassed=1`
     db.query(sql,(err,results)=>{
         // sql执行失败
         if (err) return res.cc(err)

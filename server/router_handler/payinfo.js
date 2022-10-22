@@ -18,9 +18,11 @@ exports.pay = (req, res) => {
                 let totalPrice = selectRes_1[0].price
                 let proId = selectRes_1[0].proId
                 // 查询库存
-                db.query(`select stock,price from product where proId=${proId}`, (checkErr, checkRes) => {
+                db.query(`select userId,stock,price from product where proId=${proId}`, (checkErr, checkRes) => {
                     if (checkErr || checkRes.length !== 1) return console.info(checkErr ? checkErr : new Error('订单数据插入失败！'));
                     let stock = checkRes[0].stock
+                    let ownerId = checkRes[0].userId
+
                     // 判断是否还有库存
                     if (stock > 0) {
                         // 判断库存量是否能满足订单数量
@@ -29,7 +31,7 @@ exports.pay = (req, res) => {
                             db.query(`update product set stock=? where proId=${proId}`, stock - quantity, (udErr, udRes) => {
                                 if (udErr || udRes.affectedRows !== 1) return console.info(udErr ? udErr : new Error('库存数量修改失败！'));
                                 // 再循环创建已选商品订单并插入orders
-                                db.query(`insert into orders set ?`, { userId: req.auth.userId, carId: item, proId: proId, addressId: orderInfo.addressId, orderNum: createOrderNum(), quantity: quantity, totalPrice: totalPrice, status: orderInfo.payStatus ? 20 : 10, payTime: orderInfo.payStatus ? getCurrentTime : null, createTime: getCurrentTime }, (err_1, results_1) => {
+                                db.query(`insert into orders set ?`, { ownerId:ownerId,userId: req.auth.userId, carId: item, proId: proId, addressId: orderInfo.addressId, orderNum: createOrderNum(), quantity: quantity, totalPrice: totalPrice, status: orderInfo.payStatus ? 20 : 10, payTime: orderInfo.payStatus ? getCurrentTime : null, createTime: getCurrentTime }, (err_1, results_1) => {
                                     if (err_1 || results_1.affectedRows !== 1) return console.info(err_1 ? err_1 : new Error('订单数据插入失败！'));
                                     // 获取orderid   results_1.insertId 最后插入的那条数据的 id
                                     // 创建订单成功后,循环插入支付信息
@@ -108,10 +110,11 @@ exports.buyNow = (req, res) => {
     let quantity = orderInfo.quantity
     let totalPrice = orderInfo.price * quantity
     // 查询库存
-    db.query(`select stock,price from product where proId=${orderInfo.proId}`, (checkErr, checkRes) => {
+    db.query(`select userId,stock,price from product where proId=${orderInfo.proId}`, (checkErr, checkRes) => {
         if (checkErr) res.cc(checkErr)
         if (checkRes.length !== 1) res.cc("查询库存失败！", 500)
         let stock = checkRes[0].stock
+        let ownerId = checkRes[0].userId
         // 判断是否还有库存
         if (stock > 0) {
             // 判断库存量是否能满足订单数量
@@ -126,7 +129,7 @@ exports.buyNow = (req, res) => {
                         if (err) return res.cc(err)
                         if (results.affectedRows !== 1) return res.cc("添加至购物车失败！", 500)
                         // 再创建已选商品订单并插入orders  results.insertId 插入的购物车那条数据的 id
-                        db.query(`insert into orders set ?`, { userId: req.auth.userId, carId: results.insertId, proId: orderInfo.proId, addressId: orderInfo.addressId, orderNum: createOrderNum(), quantity: quantity, totalPrice: totalPrice, status: orderInfo.payStatus ? 20 : 10, payTime: orderInfo.payStatus ? getCurrentTime : null, createTime: getCurrentTime }, (err_1, results_1) => {
+                        db.query(`insert into orders set ?`, { ownerId:ownerId,userId: req.auth.userId, carId: results.insertId, proId: orderInfo.proId, addressId: orderInfo.addressId, orderNum: createOrderNum(), quantity: quantity, totalPrice: totalPrice, status: orderInfo.payStatus ? 20 : 10, payTime: orderInfo.payStatus ? getCurrentTime : null, createTime: getCurrentTime }, (err_1, results_1) => {
                             if (err_1) res.cc(err_1)
                             if (results_1.affectedRows !== 1) res.cc("订单数据插入失败！", 500)
                             // 获取orderid   results_1.insertId 最后插入的那条数据的 id

@@ -161,17 +161,9 @@ export default {
     handleClick(tab, event) {
       let type = event.target.id.split("-")[1];
       if (type === "all") {
-        this.tableData = this.orderInfo.all.sort((a, b) => {
-          return (
-            new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
-          );
-        });
+        this.tableData = this.orderInfo.all
       } else {
-        this.tableData = this.orderInfo[type * 1].sort((a, b) => {
-          return (
-            new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
-          );
-        });
+        this.tableData = this.orderInfo[type * 1]
       }
     },
     // 查看详情
@@ -195,12 +187,7 @@ export default {
           if (res.status === 200) {
             // 取消订单成功后重新获取订单列表
             this.$store.dispatch("getMyOrder").then(() => {
-              this.tableData = this.orderInfo[this.activeName].sort((a, b) => {
-                return (
-                  new Date(b.createTime).getTime() -
-                  new Date(a.createTime).getTime()
-                );
-              });
+              this.tableData = this.orderInfo[this.activeName]
             });
             this.$message({
               type: "success",
@@ -243,14 +230,7 @@ export default {
             if (res.status === 200) {
               // 收货成功后重新获取订单列表
               this.$store.dispatch("getMyOrder").then(() => {
-                this.tableData = this.orderInfo[this.activeName].sort(
-                  (a, b) => {
-                    return (
-                      new Date(b.createTime).getTime() -
-                      new Date(a.createTime).getTime()
-                    );
-                  }
-                );
+                this.tableData = this.orderInfo[this.activeName]
               });
               this.$message({
                 type: "success",
@@ -286,18 +266,11 @@ export default {
         type: "warning",
       })
         .then(() => {
-          this.$api.delOrder(item.orderId).then((res) => {
+          this.$api.delOrder({orderId:item.orderId}).then((res) => {
             if (res.status === 200) {
               // 删除订单成功后重新获取订单列表
               this.$store.dispatch("getMyOrder").then(() => {
-                this.tableData = this.orderInfo[this.activeName].sort(
-                  (a, b) => {
-                    return (
-                      new Date(b.createTime).getTime() -
-                      new Date(a.createTime).getTime()
-                    );
-                  }
-                );
+                this.tableData = this.orderInfo[this.activeName]
               });
               this.$message({
                 type: "success",
@@ -322,15 +295,8 @@ export default {
   created() {
     this.$store.dispatch("getMyOrder").then(() => {
       this.tableData = this.orderInfo.all;
-      this.tableData.sort((a, b) => {
-        return (
-          new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
-        );
-      });
     });
-    // console.log(this.orderInfo);
   },
-  mounted() {},
 };
 </script>
 

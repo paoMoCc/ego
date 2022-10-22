@@ -28,7 +28,7 @@
                   :style="{ display: currentIndex == index ? 'block' : 'none' }"
                 >
                   <div class="subitem">
-                    <dl class="fore" v-for="c2 in c1.child" :key="c2.cateId">
+                    <dl class="fore" v-for="c2 in c1.children" :key="c2.cateId">
                       <dt>
                         <a
                           :data-cateName="c2.cateName"
@@ -38,7 +38,7 @@
                         >
                       </dt>
                       <dd>
-                        <em v-for="c3 in c2.child" :key="c3.cateId">
+                        <em v-for="c3 in c2.children" :key="c3.cateId">
                           <a
                             :data-cateName="c3.cateName"
                             :data-cateId="c3.cateId"

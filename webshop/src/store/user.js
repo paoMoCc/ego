@@ -46,13 +46,13 @@ const mutations = {
 };
 const getters = {
   isUser(state) {
-    return state.userInfo.role === 2
+    return state.userInfo.role*1 === 2
   },
   isMechant(state) {
-    return state.userInfo.role === 1
+    return state.userInfo.role*1 === 1
   },
   isAdmin(state) {
-    return state.userInfo.role === 0
+    return state.userInfo.role*1 === 0
   },
   isLogin(state,getters) {
     // return state.userInfo.userId === undefined ? false : true

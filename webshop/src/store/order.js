@@ -17,7 +17,7 @@ const mutations = {
   },
   GETORDERINFO(state, orderInfo) {
     state.orderInfo.all = orderInfo
-    for (let i = 10; i < 60; i+=10) {
+    for (let i = 10; i < 60; i += 10) {
       state.orderInfo[i] = orderInfo.filter(item => item.status === i)
     }
   }
@@ -26,10 +26,15 @@ const actions = {
   //获取用户地址信息
   async getMyAddress({ commit }) {
     let res = await getAddress()
+    let defaultAdd = [{ area: 'N/A', detailAdd: 'N/A', name: 'N/A', phone: 'N/A',noData:true }]
     if (res.status === 200) {
-      commit('GETUSERADDRESS', res.data)
+      if (res.data.length) {
+        commit('GETUSERADDRESS', res.data)
+      } else {
+        commit("GETUSERADDRESS", defaultAdd)
+      }
     } else if (res.status === 201) {
-      commit("GETUSERADDRESS", [])
+      commit("GETUSERADDRESS", defaultAdd)
     } else {
       Vue.prototype.$message({
         showClose: true,

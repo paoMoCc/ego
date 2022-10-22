@@ -11,7 +11,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
-            v-for="c2 in c1.child"
+            v-for="c2 in c1.children"
             :key="c2.cateId"
             @click.native="handleDown(c2)"
             >{{ c2.cateName }}</el-dropdown-item
@@ -36,7 +36,7 @@
     </div>
 
     <!-- 商品列表 -->
-    <div class="goods" v-if="!isSearchListNull">
+    <div class="goods" v-if="!isSearchListNull" v-loading="loading">
       <!-- 如果搜索结果为空，则不显示该列表，显示提示信息 -->
       <el-row>
         <el-col :span="5" v-for="item in searchList" :key="item.proId">
@@ -82,7 +82,9 @@ export default {
   name: "Search",
   components: { SearchBar },
   data() {
-    return {};
+    return {
+      loading: false,
+    };
   },
   computed: {
     ...mapState({
@@ -152,16 +154,32 @@ export default {
       // 根据tag类型发请求获取searchList
       // 1.分类类型
       if (tag.info) {
-        this.$store.dispatch("searchByTag", { cateid: tag.info.cateId });
+        this.loading = true;
+        setTimeout(() => {
+          this.$store.dispatch("searchByTag", { cateid: tag.info.cateId });
+          this.loading = false;
+        }, 500);
       } else if (tag.keyWord) {
-        this.$store.dispatch("searchByTag", { keyWord: tag.keyWord });
+        this.loading = true;
+        setTimeout(() => {
+          this.$store.dispatch("searchByTag", { keyWord: tag.keyWord });
+          this.loading = false;
+        }, 500);
       }
     },
     getAll() {
-      this.$store.dispatch("getAllProduct");
+      this.loading = true;
+      setTimeout(() => {
+        this.$store.dispatch("getAllProduct");
+        this.loading = false;
+      }, 500);
     },
     handleDown(c2) {
-      this.$store.dispatch("searchByDropDown", c2);
+      this.loading = true;
+      setTimeout(() => {
+        this.$store.dispatch("searchByDropDown", c2);
+        this.loading = false;
+      }, 500);
     },
     gotoDetail(item) {
       this.$router.push({ name: "detail", query: item });

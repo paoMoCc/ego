@@ -7,8 +7,8 @@ module.exports = function toTree(data){
       obj[item.cateId] = Object.assign(item, obj[item.cateId] || {});                
       if (item.rootId) {                    
          let parent = obj[item.rootId] || {};        
-         parent.child = parent.child || [];                     
-         parent.child.push(item);                
+         parent.children = parent.children || [];                     
+         parent.children.push(item);                
          obj[item.rootId] = parent;                
       } else {                    
          result.push(obj[item.cateId])              

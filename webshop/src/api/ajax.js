@@ -26,7 +26,7 @@ requests.interceptors.request.use((config) => {
     config.headers['Content-Type']="application/json";
     config.data=JSON.stringify(config.data);  
   }
-  if(config.url.indexOf('/my/uploadAvatar') !== -1){
+  if(config.url.indexOf('/my/uploadAvatar') !== -1 || config.url.indexOf('/product/addPro') !== -1){
     config.headers['Content-Type']='multipart/form-data';
   }
   return config;

@@ -57,10 +57,6 @@ export default {
   background-color: #eaeaea;
   width: 100%;
   height: 100px;
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  
 
   .copyright {
     padding: 10px 10px 0 10px;

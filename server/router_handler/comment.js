@@ -28,7 +28,7 @@ exports.delComment = (req, res) => {
 exports.getComment = (req, res) => {
     let promiseArr = []
     // 查评论
-    db.query(`select * from comment where proId=${req.body.proId} and status=1`, (err_1, result_1) => {
+    db.query(`select * from comment where proId=${req.body.proId} and status=1 order by createTime desc`, (err_1, result_1) => {
         if (err_1) return res.cc(err_1)
         if (result_1.length < 1) return res.cc('获取评价失败！什么都没有呢~~', 201)
         // 根据userid查出用户信息

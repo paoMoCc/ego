@@ -33,16 +33,10 @@ export const getCate = () => axios.get('/cate/getCate')
 export const getProByCateId = (data) => axios({ url: '/product/getPro', method: 'post', data: data })
 // 获取所有在售商品
 export const getAllPro = () => axios.get('/product/getAllPro')
-// 获取我出售的商品
-export const getMyPro = () => axios.get('/product/getMyPro')
 // 搜索商品
 export const searchPro = (keyword) => axios.post('/product/searchPro', keyword)
 // 添加商品
 export const addPro = (data) => axios.post('/product/addPro', data)
-// 下架或重新上架我的商品
-export const changeProState = (data) => axios.post('/product/changeProStatus', data)
-// 删除商品
-export const delPro = (proId) => axios.delete('/product/changeProStatus', proId)
 
 
 // cart
@@ -76,13 +70,13 @@ export const deleteAddress = (addressId) => axios({ url: '/address/deleteAddress
 // 获取订单
 export const getOrder = (type) => axios({ url: '/order/getOrder', method: 'post', data: { type } })
 // 取消订单 传递一个数组
-export const cancelOrder = (cancelOrderIds) => axios({url: '/order/cancelOrder', method: 'post', data: {cancelOrderIds}})
+export const cancelOrder = (cancelOrderIds) => axios({ url: '/order/cancelOrder', method: 'post', data: { cancelOrderIds } })
 // 发货
-export const sendPro = (orderId) => axios({ url: '/order/sendPro', method: 'post', data: { orderId } })
+export const sendPro = (data) => axios.post('/order/sendPro', data, qs.stringify(data, { indices: false }))
 // 收货
 export const receivePro = (orderId) => axios({ url: '/order/receivePro', method: 'post', data: { orderId } })
 // 删除订单
-export const delOrder = (orderId) => axios({ url: '/order/delOrder', method: 'post', data: { orderId } })
+export const delOrder = (data) => axios.post('/order/delOrder', data, qs.stringify(data, { indices: false }))
 
 
 // payInfo
@@ -105,3 +99,50 @@ export const evaluate = (data) => axios({ url: '/comment/eval', method: 'post', 
 export const delComment = (commentId) => axios({ url: '/comment/delComment', method: 'delete', data: { commentId } })
 // 获取评价
 export const getComment = (proId) => axios({ url: '/comment/getComment', method: 'post', data: { proId } })
+
+
+// admin
+
+// 根据角色获取后台展示数据
+export const getBackendData = (data) => axios({ url: '/admin/getData', method: 'post', data })
+// 根据角色获取/筛选所有商品(带分页功能)
+export const fetchList = (data) => axios({ url: '/admin/fetchList', method: 'post', data })
+// 下架或重新上架商品
+export const changeProState = (data) => axios.post('/admin/changeProStatus', data, qs.stringify(data, { indices: false }))
+// 删除商品
+export const delPro = (proIds) => axios({ url: '/admin/delPro', method: 'delete', params: { proIds }, paramsSerializer: params => qs.stringify(params, { indices: false }) })
+// 修改库存
+export const changeProStock = (data) => axios({ url: '/admin/changeProStock', method: 'post', data })
+// 根据商品id获取商品信息
+export const getProById = (proId) => axios({ url: '/admin/getProById', method: 'post', data:{proId} })
+// 修改商品信息
+export const updatePro = (data) => axios({ url: '/admin/updatePro', method: 'post', data })
+// 根据rootId获取分类信息
+export const getCateByRootId = (data) => axios({ url: '/admin/getCateByRootId', method: 'post', data })
+// 删除分类 
+export const delCate = (cateId) => axios({ url: '/admin/delCate', method: 'delete', data: { cateId } })
+// 修改分类 
+export const updateCate = (data) => axios({ url: '/admin/updateCate', method: 'post', data })
+// 根据id获取分类
+export const getCateByCateId = (cateId) => axios({ url: '/admin/getCateByCateId', method: 'post', data: { cateId } })
+// 获取订单
+export const getOrderData = (data) => axios({ url: '/admin/getOrderData', method: 'post', data })
+// 获取订单
+export const getOrderById = (orderId) => axios({ url: '/admin/getOrderById', method: 'post', data: { orderId } })
+// 获取未审核的商品
+export const getUncheckedPro = (data) => axios({ url: '/admin/getUncheckedPro', method: 'post', data })
+// 审核商品
+export const checkPro = (data) => axios.post('/admin/checkPro', data, qs.stringify(data, { indices: false }))
+// 获取未审核的分类
+export const getUncheckedCate = (data) => axios({ url: '/admin/getUncheckedCate', method: 'post', data })
+// 审核分类
+export const checkCate = (data) => axios.post('/admin/checkCate', data, qs.stringify(data, { indices: false }))
+// 获取所有用户
+export const getAllUser = (data) => axios({ url: '/admin/getAllUser', method: 'post', data })
+// 删除用户
+export const delUser = (userIds) => axios({ url: '/admin/delUser', method: 'delete', params: { userIds }, paramsSerializer: params => qs.stringify(params, { indices: false }) })
+// 封禁用户
+export const banUser = (data) => axios.post('/admin/banUser', data, qs.stringify(data, { indices: false }))
+// 修改用户权限 
+export const changeRole = (data) => axios({ url: '/admin/changeRole', method: 'post', data })
+

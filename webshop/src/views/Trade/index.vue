@@ -6,7 +6,7 @@
       <div class="header">
         <h2>选择收货地址</h2>
 
-        <el-row :gutter="20">
+        <el-row class="addCard" :gutter="20" v-if="!address[0].noData">
           <el-col
             :span="6"
             v-for="(item, index) in address"
@@ -26,6 +26,7 @@
             </div></el-col
           >
         </el-row>
+        <h1 class="null" v-else>还没有收货地址快去添加吧！</h1>
 
         <router-link class="manage" to="/center/address"
           >管理收货地址</router-link
@@ -78,7 +79,7 @@
           </el-table-column>
           <!-- 小计 -->
           <el-table-column label="小计" width="200">
-              <span class="price">￥{{ $route.query.total.toFixed(2) }}</span>
+            <span class="price">￥{{ $route.query.total.toFixed(2) }}</span>
           </el-table-column>
         </el-table>
 
@@ -128,26 +129,37 @@ export default {
     },
     // 下单
     submit() {
-      let cartIds = this.$route.query.checkList.map((item) => item.carId);
-      const loading = this.$loading({
-        lock: true,
-        text: "订单生成中...",
-        spinner: "el-icon-loading",
-        background: "rgba(255, 255, 255, 0.8)",
-      });
-      setTimeout(() => {
-        loading.close();
-        this.$router.replace({
-          name: "pay",
-          params: {
-            cartIds,
-            addressId: this.activeId,
-            total: this.$route.query.total,
-            buyNow: this.$route.query.buyNow,
-            product: this.$route.query.checkList[0],
-          },
+      if (this.address[0].noData) {
+        this.$message({
+          message: "先去添加地址吧！",
+          type: "info",
+          duration: 1000,
         });
-      }, 2000);
+        setTimeout(() => {
+          this.$router.replace({name:"address"});
+        }, 1000);
+      } else {
+        let cartIds = this.$route.query.checkList.map((item) => item.carId);
+        const loading = this.$loading({
+          lock: true,
+          text: "订单生成中...",
+          spinner: "el-icon-loading",
+          background: "rgba(255, 255, 255, 0.8)",
+        });
+        setTimeout(() => {
+          loading.close();
+          this.$router.replace({
+            name: "pay",
+            params: {
+              cartIds,
+              addressId: this.activeId,
+              total: this.$route.query.total,
+              buyNow: this.$route.query.buyNow,
+              product: this.$route.query.checkList[0],
+            },
+          });
+        }, 2000);
+      }
     },
     // 取消
     cancel() {
@@ -164,8 +176,6 @@ export default {
     this.$store.dispatch("getMyAddress");
     this.activeId = this.address[0].addressId;
     this.confirmAdd = this.address[0];
-    // cartItem   arr
-    // console.log(this.$route.query);
   },
 };
 </script>
@@ -188,13 +198,13 @@ export default {
     }
     // address卡片布局start
     .el-row {
-      margin-bottom: 20px;
       &:last-child {
         margin-bottom: 0;
       }
     }
     .el-col {
       border-radius: 10px;
+      margin-bottom: 20px;
       cursor: pointer;
       position: relative;
       .first {
@@ -221,6 +231,10 @@ export default {
         background-color: #ccc;
         color: #fff;
       }
+    }
+    // address无数据提示
+    .null {
+      margin: 0 325px 20px;
     }
     .grid-content {
       box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;

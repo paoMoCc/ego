@@ -206,7 +206,7 @@ export default {
     // 判断是否显示写评论区域
     this.product.orderId && (this.isShow = true);
     this.$store.dispatch("getComents", this.product.proId).then(() => {
-      this.reviewList = this.review.all;
+      this.reviewList = this.review.all
     });
   },
   computed: {
@@ -227,12 +227,7 @@ export default {
   methods: {
     // 筛选评论
     switchTab(value) {
-      this.reviewList = this.review[value].sort((a, b) => {
-        return (
-          new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
-        );
-      });
-      console.log(this.review, this.reviewList);
+      this.reviewList = this.review[value]
     },
     // 立即购买
     buyNow() {
@@ -313,7 +308,12 @@ export default {
               // 关闭写评论区域
               this.isShow = false;
               // 评价成功之后重新获取评价列表
-              this.$store.dispatch("getComents", this.product.proId);
+              this.$store
+                .dispatch("getComents", this.product.proId)
+                .then(() => {
+                  this.radio = "all"
+                  this.reviewList = this.review.all;
+                });
               this.$message({
                 showClose: true,
                 message: res.message,
