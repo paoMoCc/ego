@@ -3,11 +3,16 @@ import { getAllPro, getProByCateId, searchPro } from '@/api'
 const state = {
   //仓库初始状态
   searchList: [],
-  tags: []
+  tags: [],
+  // 排序状态
+  isDefault: false,
+  isNew: false,
+  isPrice: false,
+  isDesc: true,
 };
 const mutations = {
   UPDATESEARCHLIST(state, data) {
-    state.searchList = data||[];
+    state.searchList = data || [];
   },
   ADDTAGCATE(state, tag) {
     // 添加分类标签
@@ -26,6 +31,47 @@ const mutations = {
   },
   CLEARSEARCHLIST(state) {
     state.searchList = []
+  },
+  CHANGEORDER(state, obj) {
+    let isDesc = obj.isDesc
+    let order = obj.order
+    if (order === 1) {
+      state.isNew = false;
+      state.isPrice = false;
+      state.isDefault = true;
+      state.isDesc = !state.isDesc
+      state.searchList.sort((a, b) => {
+        if (isDesc) {
+          return b.stock - a.stock
+        } else {
+          return a.stock - b.stock
+        }
+      })
+    } else if (order === 2) {
+      state.isPrice = false;
+      state.isDefault = false;
+      state.isNew = true;
+      state.isDesc = !state.isDesc
+      state.searchList.sort((a, b) => {
+        if (isDesc) {
+          return b.proId - a.proId
+        } else {
+          return a.proId - b.proId
+        }
+      })
+    } else {
+      state.isDefault = false;
+      state.isNew = false;
+      state.isPrice = true;
+      state.isDesc = !state.isDesc
+      state.searchList.sort((a, b) => {
+        if (isDesc) {
+          return b.price - a.price
+        } else {
+          return a.price - b.price
+        }
+      })
+    }
   }
 };
 const actions = {

@@ -20,19 +20,58 @@
       </el-dropdown>
     </div>
 
-    <!-- tag标签 -->
-    <div class="tag">
-      <el-tag type="info" @click="getAll">全部商品</el-tag>
-      <el-tag
-        v-for="(tag, index) in tags"
-        :key="tag.name"
-        closable
-        :type="tag.type"
-        @close="handleClose(index)"
-        @click="handleClick(tag)"
-      >
-        {{ tag.name || tag.keyWord }}
-      </el-tag>
+    <div class="nav">
+      <!-- tag标签 -->
+      <div class="tag">
+        <el-tag type="info" @click="getAll">全部商品</el-tag>
+        <el-tag
+          v-for="(tag, index) in tags"
+          :key="tag.name"
+          closable
+          :type="tag.type"
+          @close="handleClose(index)"
+          @click="handleClick(tag)"
+        >
+          {{ tag.name || tag.keyWord }}
+        </el-tag>
+      </div>
+      <!-- 排序 -->
+      <div class="filter">
+        <div
+          class="order"
+          :class="{ active: isDefault }"
+          @click="changeOrder(1)"
+        >
+          综合<i
+            v-show="isDefault"
+            :class="isDesc ? 'el-icon-bottom' : 'el-icon-top'"
+          ></i>
+        </div>
+        <div class="order" :class="{ active: isNew }" @click="changeOrder(2)">
+          新品<i
+            v-show="isNew"
+            :class="isDesc ? 'el-icon-bottom' : 'el-icon-top'"
+          ></i>
+        </div>
+        <div class="order" :class="{ active: isPrice }" @click="changeOrder(3)">
+          价格<i
+            v-show="isPrice"
+            :class="isDesc ? 'el-icon-bottom' : 'el-icon-top'"
+          ></i>
+        </div>
+        <!-- <div class="icon-container">
+          <div
+            class="icon"
+            :class="{ active: !isDesc }"
+            @click="isDesc = false"
+          >
+            升序<i class="el-icon-top"></i>
+          </div>
+          <div class="icon" :class="{ active: isDesc }" @click="isDesc = true">
+            降序<i class="el-icon-top"></i>
+          </div>
+        </div> -->
+      </div>
     </div>
 
     <!-- 商品列表 -->
@@ -70,8 +109,6 @@
         description="哎呀！该分类还没有在售的商品~~"
       ></el-empty>
     </div>
-
-    <!-- <button @click="show">testShow</button> -->
   </div>
 </template>
 
@@ -95,6 +132,18 @@ export default {
     }),
     ...mapState({
       searchList: (state) => state.search.searchList,
+    }),
+    ...mapState({
+      isDefault: (state) => state.search.isDefault,
+    }),
+    ...mapState({
+      isNew: (state) => state.search.isNew,
+    }),
+    ...mapState({
+      isPrice: (state) => state.search.isPrice,
+    }),
+    ...mapState({
+      isDesc: (state) => state.search.isDesc,
     }),
     isSearchListNull() {
       return this.searchList.length === 0;
@@ -149,8 +198,6 @@ export default {
       this.$store.commit("DELETETAG", index);
     },
     handleClick(tag) {
-      // console.log(tag);
-
       // 根据tag类型发请求获取searchList
       // 1.分类类型
       if (tag.info) {
@@ -165,6 +212,22 @@ export default {
           this.$store.dispatch("searchByTag", { keyWord: tag.keyWord });
           this.loading = false;
         }, 500);
+      }
+    },
+    changeOrder(val) {
+      if (val === 1) {
+        this.$store.commit("CHANGEORDER", { order: val, isDesc: this.isDesc });
+      } else if (val === 2) {
+        this.$store.commit("CHANGEORDER", { order: val, isDesc: this.isDesc });
+      } else {
+        this.$store.commit("CHANGEORDER", { order: val, isDesc: this.isDesc });
+      }
+    },
+    changeDesc(val) {
+      if (val) {
+        this.isDesc = false;
+      } else {
+        this.isDesc = true;
       }
     },
     getAll() {
@@ -212,14 +275,54 @@ export default {
   }
 }
 
-.tag {
-  padding-left: 155px;
-  & > * {
-    margin: 10px 5px 0;
-    cursor: pointer;
+.nav {
+  display: flex;
+  justify-content: space-between;
+  width: 1240px;
+  .tag {
+    padding-left: 155px;
+    & > * {
+      margin: 10px 5px 0;
+      cursor: pointer;
+    }
+    & > *:hover {
+      box-shadow: 0 0 8px;
+    }
   }
-  & > *:hover {
-    box-shadow: 0 0 8px;
+  .filter {
+    display: flex;
+    margin: 10px 0;
+    width: 190px;
+    .order {
+      min-width: 50px;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      padding: 0 5px;
+      background: #fbfbfb;
+      border: 1px solid #e2e2e2;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+      box-sizing: border-box;
+      cursor: pointer;
+      &:hover {
+        font-weight: bold;
+        background-color: #ccc;
+      }
+    }
+    .icon-container {
+      height: 35px;
+      .icon {
+        font-size: 12px;
+        border: 1px solid #e2e2e2;
+        box-sizing: border-box;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+        cursor: pointer;
+        &:hover {
+          font-weight: bold;
+          background-color: #ccc;
+        }
+      }
+    }
   }
 }
 
@@ -297,5 +400,13 @@ export default {
       }
     }
   }
+}
+
+.pagination-container {
+  width: 350px;
+  margin: 10px auto;
+}
+.active {
+  background-color: red !important;
 }
 </style>

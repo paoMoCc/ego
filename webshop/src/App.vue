@@ -6,7 +6,7 @@
         <router-view></router-view>
       </transition>
     </div>
-    <Footer v-if="$route.path.indexOf('/backend')"></Footer>
+    <Footer v-if="$route.path.indexOf('/backend') && $route.path.indexOf('/register') && $route.path.indexOf('/login')"></Footer>
   </div>
 </template>
 

@@ -6,6 +6,7 @@ const multer = require("multer")
 const path = require("path")
 const productHandler = require("../router_handler/product")
 const { searchPro_schema, addPro_schema } = require('../schema/product')
+const getCurrentTime = require("../utils")
 
 // multer配置
 // 存入sql的路径
@@ -66,16 +67,16 @@ router.post('/addPro', imageUploader.array("productImgs", 5), expressJoi(addPro_
         }
     }
     let productInfo = req.body
-    const sql = `insert into product set cateId=?,proName=?,price=?,stock=?,subTitle=?,detail=?,productImgs=?,userId=?`
-    db.query(sql, [productInfo.cateId, productInfo.proName, productInfo.price, productInfo.stock, productInfo.subTitle, productInfo.detail, filesUrl, req.auth.userId], (err, results) => {
-        if (err) { res.cc(err) } 
+    const sql = `insert into product set cateId=?,proName=?,price=?,stock=?,subTitle=?,detail=?,productImgs=?,userId=?,createTime=?`
+    db.query(sql, [productInfo.cateId, productInfo.proName, productInfo.price, productInfo.stock, productInfo.subTitle, productInfo.detail, filesUrl, req.auth.userId, getCurrentTime], (err, results) => {
+        if (err) { res.cc(err) }
         else if (results.affectedRows !== 1) { res.cc("添加商品失败！", 500) }
-        else { 
+        else {
             // 清空上一次文件残留信息
             fileArr = []
             fileSqlName = ''
             res.cc('添加商品成功！', 200)
-         }
+        }
     })
 })
 
