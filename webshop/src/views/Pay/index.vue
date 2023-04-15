@@ -85,10 +85,64 @@
         </div>
 
         <div class="submit">
-          <a class="btn" @click="payMoney">立即支付</a>
+          <a class="btn" @click="show">立即支付</a>
         </div>
       </div>
     </div>
+    <el-dialog title="正在使用支付宝支付" :visible.sync="dialogVisible">
+      <div class="topBox">
+        <p class="title">正在使用即时到账交易</p>
+        <div class="infoBox">
+          <p><span style="font-size:13px;margin-right:10px;font-weight:bolder">测试</span><span>收款方：沙盒环境</span></p>
+          <p>
+            <span style="color:red;font-size:16px;font-weight:bolder">{{ $route.params.total.toFixed(2) }}</span
+            > 元
+          </p>
+        </div>
+      </div>
+      <div class="payBox">
+        <div><img class="img" src="./images/付款页面.png" alt="" /></div>
+
+        <div class="line"></div>
+
+        <div class="right">
+          <div class="rightOne rightFlex">
+            <span>登录支付宝账户付款</span
+            ><span style="font-size: 13px; color: skyblue">新用户注册</span>
+          </div>
+          <div class="rightTow">
+            <div class="rightFlex">
+              <span>账户名：</span><span>忘记账户名？</span>
+            </div>
+            <div>
+              <el-input
+                v-model.trim="acount"
+                placeholder="手机号/邮箱"
+                :maxlength="11"
+              ></el-input>
+            </div>
+          </div>
+          <div class="rightThree">
+            <div class="rightFlex">
+              <span>支付密码：</span><span>忘记密码？</span>
+            </div>
+            <el-input
+              v-model.trim="passWord"
+              show-password
+              :maxlength="6"
+            ></el-input>
+            <p class="tips">
+              请输入账户的<span style="color: red">支付密码</span
+              >,不是登录密码。
+            </p>
+            <div class="rightFlex">
+              <el-button @click="cancelPay">取消支付</el-button>
+              <el-button type="primary" @click="payMoney">确定支付</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -100,18 +154,32 @@ export default {
   components: { SearchBar },
   data() {
     return {
+      acount: undefined,
+      passWord: undefined,
       //支付状态码
       payForm: 2,
+      dialogVisible: false,
+      rules: {},
     };
   },
   computed: {},
-  //工作的时候：尽量别再生命周期函数中async|await
   mounted() {
     // console.log(this.$route.params);
   },
   methods: {
     choseIt(num) {
       this.payForm = num;
+    },
+    show(){
+      this.dialogVisible = true
+    },
+    resetAndHide() {
+      this.dialogVisible = false;
+      this.acount = undefined;
+      this.passWord = undefined;
+    },
+    cancelPay(){
+      this.resetAndHide()
     },
     // 支付
     payMoney() {
@@ -132,17 +200,18 @@ export default {
           if (param.buyNow) {
             this.$api
               .buyNow({
-                proId:param.product.proId*1,
-                price:param.product.price*1,
-                quantity:param.product.quantity*1,
-                productImgs:param.product.productImgs,
-                addressId: param.addressId*1,
+                proId: param.product.proId * 1,
+                price: param.product.price * 1,
+                quantity: param.product.quantity * 1,
+                productImgs: param.product.productImgs,
+                addressId: param.addressId * 1,
                 payForm: this.payForm,
                 payStatus: 1,
               })
               .then((res) => {
                 if (res.status === 200) {
                   setTimeout(() => {
+                    this.resetAndHide();
                     loading.close();
                     this.$router.replace("/paySuccess");
                   }, 2000);
@@ -154,17 +223,18 @@ export default {
                   console.log(res.message);
                 }
               });
-          }else if (param.repay) {
+          } else if (param.repay) {
             // 重新支付成功
             this.$api
               .repay({
-                orderId: param.checkList[0].orderId*1,
+                orderId: param.checkList[0].orderId * 1,
                 payForm: this.payForm,
                 payStatus: 1,
               })
               .then((res) => {
                 if (res.status === 200) {
                   setTimeout(() => {
+                    this.resetAndHide();
                     loading.close();
                     this.$router.replace("/paySuccess");
                   }, 2000);
@@ -187,6 +257,7 @@ export default {
               .then((res) => {
                 if (res.status === 200) {
                   setTimeout(() => {
+                    this.resetAndHide();
                     loading.close();
                     this.$router.replace("/paySuccess");
                   }, 2000);
@@ -200,15 +271,15 @@ export default {
           }
         })
         .catch(() => {
-          // 立即购买支付失败
+          // 立即购买支付失败;
           if (param.buyNow) {
             this.$api
               .buyNow({
-                proId:param.product.proId*1,
-                price:param.product.price*1,
-                quantity:param.product.quantity*1,
-                productImgs:param.product.productImgs,
-                addressId: param.addressId*1,
+                proId: param.product.proId * 1,
+                price: param.product.price * 1,
+                quantity: param.product.quantity * 1,
+                productImgs: param.product.productImgs,
+                addressId: param.addressId * 1,
                 payForm: this.payForm,
                 payStatus: 0,
               })
@@ -229,9 +300,9 @@ export default {
                   console.log(res.message);
                 }
               });
-          }else if (param.repay) {
+          } else if (param.repay) {
             // 重新支付失败
-            this.$router.push("/center/myOrder")
+            this.$router.push("/center/myOrder");
           } else {
             // 正常流程支付失败
             this.$api
@@ -421,5 +492,62 @@ export default {
     0 0 8px rgba(102, 175, 233, 0.6);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px rgba(102, 175, 233, 0.6) !important;
+}
+.topBox {
+  font-size: 12px;
+  .title {
+    margin-bottom: 10px;
+  }
+  .infoBox {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+}
+.payBox {
+  height: 400px;
+  border: 3px solid rgb(166, 166, 166);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  .img {
+    width: 290px;
+    height: 290px;
+    margin: auto 0;
+  }
+  .line {
+    width: 1px;
+    height: 290px;
+    background-color: rgb(230, 230, 230);
+  }
+  .right {
+    width: 290px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    .rightFlex {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 5px;
+    }
+    .rightOne {
+      margin: 15px 0;
+      border-bottom: 2px solid rgb(204, 204, 204);
+    }
+    .rightTow {
+      margin: 15px 0;
+      font-size: 12px;
+    }
+    .rightThree {
+      margin: 15px 0;
+      font-size: 12px;
+      .tips {
+        margin: 5px 0;
+        font-size: 10px;
+        color: rgb(168, 168, 168);
+      }
+    }
+  }
 }
 </style>

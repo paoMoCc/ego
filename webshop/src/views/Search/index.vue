@@ -56,7 +56,7 @@
         <div class="order" :class="{ active: isPrice }" @click="changeOrder(3)">
           价格<i
             v-show="isPrice"
-            :class="isDesc ? 'el-icon-bottom' : 'el-icon-top'"
+            :class="isDesc ? 'el-icon-top' : 'el-icon-bottom'"
           ></i>
         </div>
         <!-- <div class="icon-container">
